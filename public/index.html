@@ -16,15 +16,6 @@
             </div>
             <canvas id="canvas" class="border" style="display: block;">canvas not supported</canvas>
 
-            <div id="new-game-dialog" class="dialog border">
-                <p>
-                    Start new Game?
-                </p>
-                <button class="start-button">
-                    Start!
-                </button>
-            </div>
-
             <div id="game-over-dialog" class="dialog border" style="display: none;">
                 <p>
                     Game over...
@@ -36,6 +27,8 @@
             </div>
 
             <div id="leaderboard" class="leaderboard border" style="display: none;">
+                <h1>Snake game!!!</h1>
+                <p>Players leaderboard of all time</p>
                 <table class="border">
                     <thead>
                         <tr>
@@ -45,28 +38,15 @@
                             <th>Time</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>text1.1</td>
-                            <td>text1.2</td>
-                            <td>text1.3</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>text2.111111111</td>
-                            <td>text2.2</td>
-                            <td>text2.3</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>text3.1</td>
-                            <td>text3.2</td>
-                            <td>text3.3</td>
-                        </tr>
-                        <tr></tr>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
+
+                <h2 class="loader" style="display: none;">Loading...</h2>
+
+                <div class="paginator">
+                    <a class="paginator-prev">Previous page</a>
+                    <a class="paginator-next">Next page</a>
+                </div>
 
                 <button class="start-button">
                     Start new game

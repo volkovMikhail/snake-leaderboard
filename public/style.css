@@ -31,7 +31,8 @@ main {
   background-color: orange;
 }
 
-.dialog > p, input {
+.dialog > p,
+input {
   margin-bottom: 1rem;
 }
 
@@ -41,22 +42,43 @@ main {
   justify-content: center;
   flex-direction: column;
   position: absolute;
-  top: 5rem;
+  top: 4.5rem;
   left: 0;
   right: 0;
   margin: auto;
   width: 550px;
-  height: 560px;
+  height: 580px;
   background-color: orange;
+}
+
+.leaderboard > p {
+  margin-bottom: 0.3rem;
 }
 
 .leaderboard > table {
   background-color: white;
   border-collapse: collapse;
   width: 90%;
-  margin-bottom: 1rem;
 }
 
-.leaderboard > table, th, td {
+.leaderboard > table,
+th,
+td {
   border: 1px solid #777;
+}
+
+.paginator {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin-top: 0.3rem;
+}
+
+.paginator > a {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.paginator > a:hover {
+  color: #777;
 }

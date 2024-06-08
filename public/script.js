@@ -200,15 +200,7 @@ function clearScores() {
 
 const timeElem = document.querySelector('#time');
 
-function addTime() {
-  const time = new Date().getTime();
-
-  const gameTime = time - initialTime;
-
-  const timeElem = document.querySelector('#time');
-
-  const sec = Math.round(gameTime / 1000); //because .getTime() its milliseconds
-
+function formatTime(sec) {
   const mins = Math.floor(sec / 60);
 
   const secsInMinute = sec - mins * 60;
@@ -216,7 +208,19 @@ function addTime() {
   const displaySecs = secsInMinute < 10 ? `0${secsInMinute}` : secsInMinute;
   const displayMins = mins < 10 ? `0${mins}` : mins;
 
-  timeElem.innerHTML = `${displayMins}:${displaySecs}`;
+  return `${displayMins}:${displaySecs}`;
+}
+
+function addTime() {
+  const time = new Date().getTime();
+
+  const gameTime = time - initialTime;
+
+  const sec = Math.round(gameTime / 1000);
+
+  const timeElem = document.querySelector('#time');
+
+  timeElem.innerHTML = formatTime(sec);
 
   userTime = sec;
 }
@@ -227,20 +231,18 @@ function clearTime() {
 }
 
 const startButtons = document.querySelectorAll('.start-button');
-const newGameDialog = document.querySelector('#new-game-dialog');
 const leaderboardDialog = document.querySelector('#leaderboard');
 
 function hideAllDialogs() {
   gameOverDialog.style.display = 'none';
-  newGameDialog.style.display = 'none';
   leaderboardDialog.style.display = 'none';
 }
 
 startButtons.forEach((startButton) => {
   startButton.addEventListener('click', () => {
-    newGame();
-
     hideAllDialogs();
+
+    newGame();
   });
 });
 
@@ -268,20 +270,27 @@ resultsButton.addEventListener('click', async () => {
     hideAllDialogs();
     resultsButton.disabled = false;
 
-    showLeaderboard();
+    showLeaderboard(leaderboardLimit, 0);
+    currentSkip = 0;
   } else {
     resultsButton.innerHTML = 'Something wrong, reload page please';
   }
 });
 
 const leaderboardBody = document.querySelector('.leaderboard > table > tbody');
+const loader = document.querySelector('.loader');
 
-async function showLeaderboard() {
+const leaderboardLimit = 20;
+
+showLeaderboard(leaderboardLimit, 0);
+
+async function showLeaderboard(limit, skip) {
+  loader.style.display = 'block';
   leaderboardDialog.style.display = 'flex';
 
   leaderboardBody.innerHTML = '';
 
-  const data = await fetch(`/leaderboard?limit=30&skip=0`, {
+  const data = await fetch(`/leaderboard?limit=${limit}&skip=${skip}`, {
     method: 'GET',
   });
 
@@ -298,7 +307,7 @@ async function showLeaderboard() {
     placeDataElement.innerHTML = row.place;
     usernameDataElement.innerHTML = row.username;
     scoreDataElement.innerHTML = row.score;
-    timeDataElement.innerHTML = row.time;
+    timeDataElement.innerHTML = formatTime(Number(row.time));
 
     tableRowElement.appendChild(placeDataElement);
     tableRowElement.appendChild(usernameDataElement);
@@ -307,4 +316,33 @@ async function showLeaderboard() {
 
     leaderboardBody.appendChild(tableRowElement);
   });
+
+  loader.style.display = 'none';
+
+  return leaderboardRows.length;
 }
+
+let currentSkip = 0;
+
+const nextPage = document.querySelector('.paginator-next');
+const prevPage = document.querySelector('.paginator-prev');
+
+let prevResDataLength = leaderboardLimit;
+
+nextPage.addEventListener('click', async () => {
+  if (prevResDataLength < leaderboardLimit) {
+    return;
+  }
+
+  currentSkip += 20;
+
+  prevResDataLength = await showLeaderboard(leaderboardLimit, currentSkip);
+});
+
+prevPage.addEventListener('click', async () => {
+  if (currentSkip !== 0) {
+    currentSkip -= 20;
+
+    prevResDataLength = await showLeaderboard(leaderboardLimit, currentSkip);
+  }
+});
