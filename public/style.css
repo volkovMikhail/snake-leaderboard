@@ -6,7 +6,7 @@ body {
   background-color: white;
 }
 
-canvas {
+.border {
   border: 1px solid #777;
   border-radius: 3px;
 }
@@ -14,4 +14,49 @@ canvas {
 main {
   width: fit-content;
   margin: 1rem auto;
+}
+
+.dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: absolute;
+  top: 5rem;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 250px;
+  height: 125px;
+  background-color: orange;
+}
+
+.dialog > p, input {
+  margin-bottom: 1rem;
+}
+
+.leaderboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: absolute;
+  top: 5rem;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 550px;
+  height: 560px;
+  background-color: orange;
+}
+
+.leaderboard > table {
+  background-color: white;
+  border-collapse: collapse;
+  width: 90%;
+  margin-bottom: 1rem;
+}
+
+.leaderboard > table, th, td {
+  border: 1px solid #777;
 }

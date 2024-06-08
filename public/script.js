@@ -1,11 +1,11 @@
 //config variables
-let snakeSize = 25;
-let snakeColor = 'olive';
-let fruitColor = 'red';
-let delay = 100;
+const snakeSize = 25;
+const snakeColor = 'olive';
+const fruitColor = 'red';
+const delay = 100;
 
-let canv = document.getElementById('canvas');
-let ctx = canv.getContext('2d');
+const canv = document.getElementById('canvas');
+const ctx = canv.getContext('2d');
 
 // canv.width = Math.floor(window.innerWidth / snakeSize) * snakeSize;
 // canv.height = Math.floor(window.innerHeight / snakeSize) * snakeSize;
@@ -20,7 +20,7 @@ const bgColor = window
 Snake = [];
 let Fruit;
 
-let direction = {
+const direction = {
   ArrowUp: false,
   ArrowDown: false,
   ArrowRight: false,
@@ -58,8 +58,13 @@ function clear() {
 }
 
 let prevKey;
+let canToggleDirection = true;
 
 window.addEventListener('keydown', (e) => {
+  if (!canToggleDirection) {
+    return;
+  }
+
   if (e.code === 'ArrowUp' && prevKey != 'ArrowDown' && e.code != prevKey) {
     toggleDirection(e.code);
   }
@@ -73,10 +78,13 @@ window.addEventListener('keydown', (e) => {
     toggleDirection(e.code);
   }
 
+  canToggleDirection = false;
   prevKey = e.code;
 });
 
 function drawNewFruit() {
+  ctx.fillStyle = fruitColor;
+
   Fruit.x = Math.round(
     Math.floor((Math.random() * canv.width) / snakeSize) * snakeSize
   );
@@ -87,6 +95,8 @@ function drawNewFruit() {
 }
 
 Snake.push(new Chunk(25, 25));
+drawSnake();
+
 Fruit = new Chunk(0, 0);
 
 let head = Snake[Snake.length - 1];
@@ -131,6 +141,8 @@ function main() {
   if (newHead.x < 0) newHead.x = canv.width;
   if (newHead.y < 0) newHead.y = canv.height;
 
+  drawSnake();
+
   for (let i = 0; i < Snake.length - 2; i++) {
     if (Snake[i].x === newHead.x && Snake[i].y === newHead.y) {
       Snake = [new Chunk(1, 1)]; //move this to game over function
@@ -138,28 +150,55 @@ function main() {
     }
   }
 
-  drawSnake();
+  canToggleDirection = true;
   ctx.fillStyle = fruitColor;
   Fruit.Draw();
 
   addTime();
 }
 
-ctx.fillStyle = fruitColor;
-drawNewFruit();
-const interval = setInterval(main, delay);
+let interval;
+
+let initialTime = new Date().getTime();
+
+function newGame() {
+  toggleDirection('');
+  clearInterval(interval);
+
+  clearScores();
+  clearTime();
+
+  initialTime = new Date().getTime();
+
+  drawNewFruit();
+  Snake = [new Chunk(25, 25)];
+
+  interval = setInterval(main, delay);
+}
+
+const gameOverDialog = document.querySelector('#game-over-dialog');
 
 function gameOver() {
   clearInterval(interval);
+
+  gameOverDialog.style.display = 'flex';
 }
+
+let userScores = 0;
+let userTime = 0;
+const scoreElem = document.querySelector('#score');
 
 function addScore() {
-  const scoreElem = document.querySelector('#score');
-
-  scoreElem.innerHTML = Number(scoreElem.innerHTML) + 1;
+  userScores++;
+  scoreElem.innerHTML = userScores;
 }
 
-const initialTime = new Date().getTime();
+function clearScores() {
+  userScores = 0;
+  scoreElem.innerHTML = 0;
+}
+
+const timeElem = document.querySelector('#time');
 
 function addTime() {
   const time = new Date().getTime();
@@ -178,4 +217,94 @@ function addTime() {
   const displayMins = mins < 10 ? `0${mins}` : mins;
 
   timeElem.innerHTML = `${displayMins}:${displaySecs}`;
+
+  userTime = sec;
+}
+
+function clearTime() {
+  userTime = 0;
+  timeElem.innerHTML = `00:00`;
+}
+
+const startButtons = document.querySelectorAll('.start-button');
+const newGameDialog = document.querySelector('#new-game-dialog');
+const leaderboardDialog = document.querySelector('#leaderboard');
+
+function hideAllDialogs() {
+  gameOverDialog.style.display = 'none';
+  newGameDialog.style.display = 'none';
+  leaderboardDialog.style.display = 'none';
+}
+
+startButtons.forEach((startButton) => {
+  startButton.addEventListener('click', () => {
+    newGame();
+
+    hideAllDialogs();
+  });
+});
+
+const resultsButton = document.querySelector('#add-results-button');
+const userNameInput = document.querySelector('#username-input');
+
+resultsButton.addEventListener('click', async () => {
+  resultsButton.disabled = true;
+
+  const requestBody = {
+    username: userNameInput.value,
+    score: userScores,
+    time: userTime,
+  };
+
+  const res = await fetch('/result', {
+    method: 'POST',
+    body: JSON.stringify(requestBody),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (res.status === 200) {
+    hideAllDialogs();
+    resultsButton.disabled = false;
+
+    showLeaderboard();
+  } else {
+    resultsButton.innerHTML = 'Something wrong, reload page please';
+  }
+});
+
+const leaderboardBody = document.querySelector('.leaderboard > table > tbody');
+
+async function showLeaderboard() {
+  leaderboardDialog.style.display = 'flex';
+
+  leaderboardBody.innerHTML = '';
+
+  const data = await fetch(`/leaderboard?limit=30&skip=0`, {
+    method: 'GET',
+  });
+
+  const leaderboardRows = (await data.json()).data;
+
+  leaderboardRows.forEach((row) => {
+    const tableRowElement = document.createElement('tr');
+
+    const placeDataElement = document.createElement('td');
+    const usernameDataElement = document.createElement('td');
+    const scoreDataElement = document.createElement('td');
+    const timeDataElement = document.createElement('td');
+
+    placeDataElement.innerHTML = row.place;
+    usernameDataElement.innerHTML = row.username;
+    scoreDataElement.innerHTML = row.score;
+    timeDataElement.innerHTML = row.time;
+
+    tableRowElement.appendChild(placeDataElement);
+    tableRowElement.appendChild(usernameDataElement);
+    tableRowElement.appendChild(scoreDataElement);
+    tableRowElement.appendChild(timeDataElement);
+
+    leaderboardBody.appendChild(tableRowElement);
+  });
 }

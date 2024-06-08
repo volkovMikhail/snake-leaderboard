@@ -14,7 +14,64 @@
             <div>
                 Time: <span id="time">00:00</span>
             </div>
-            <canvas id="canvas" style="display: block;">canvas not supported</canvas>
+            <canvas id="canvas" class="border" style="display: block;">canvas not supported</canvas>
+
+            <div id="new-game-dialog" class="dialog border">
+                <p>
+                    Start new Game?
+                </p>
+                <button class="start-button">
+                    Start!
+                </button>
+            </div>
+
+            <div id="game-over-dialog" class="dialog border" style="display: none;">
+                <p>
+                    Game over...
+                </p>
+                <input id="username-input" type="text" placeholder="Your name">
+                <button id="add-results-button">
+                    Save to leaderboard
+                </button>
+            </div>
+
+            <div id="leaderboard" class="leaderboard border" style="display: none;">
+                <table class="border">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Username</th>
+                            <th>Scores</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>text1.1</td>
+                            <td>text1.2</td>
+                            <td>text1.3</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>text2.111111111</td>
+                            <td>text2.2</td>
+                            <td>text2.3</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>text3.1</td>
+                            <td>text3.2</td>
+                            <td>text3.3</td>
+                        </tr>
+                        <tr></tr>
+                    </tbody>
+                </table>
+
+                <button class="start-button">
+                    Start new game
+                </button>
+            </div>
         </main>
         <script src="script.js"></script>
     </body>
